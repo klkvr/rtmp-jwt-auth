@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+build
+db.sqlite3
+
+.idea
+/venv
+/.env
+/centrifugo
+/logs/*
+!.gitkeep

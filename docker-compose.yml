@@ -1,0 +1,62 @@
+version: '3.7'
+
+services:
+  streaming-python:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    restart: unless-stopped
+    container_name: streaming-python
+    image: streaming-python
+    expose: 
+      - 8000
+    env_file: 
+      - .env
+    volumes:
+      - hls:/tmp/hls
+    networks:
+      streaming:
+        aliases:
+          - streaming-python
+  
+  streaming-nginx:
+    build:
+      dockerfile: Dockerfile.nginx
+      context: .
+    restart: unless-stopped
+    container_name: streaming-nginx
+    env_file: 
+      - .env
+    expose:
+      - 80
+    ports:
+      - 1935:1935
+      - 8000:80
+    volumes:
+      - hls:/tmp/hls
+    networks:
+      streaming:
+        aliases:
+          - streaming-nginx
+
+  streaming-redis:
+    image: redis
+    container_name: streaming-redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data:rw
+    user: "1000:1000"
+    expose:
+      - "6379"
+    networks:
+      streaming:
+        aliases:
+          - streaming-redis
+
+networks:
+  streaming:
+    external: true
+
+volumes:
+    hls: {}
+    redis-data: {}
